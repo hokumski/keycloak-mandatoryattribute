@@ -33,6 +33,8 @@
                 <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}" type="submit" value="${msg("doRegister")}"/>
             </div>
 
+            **<#if jsvarheader??>${jsvarheader}</#if>**
+
             <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                 <br/>
                 <div class="${properties.kcFormOptionsWrapperClass!}">

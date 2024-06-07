@@ -1,20 +1,27 @@
 package com.keenetic.account.keycloak.ma;
 
+import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.jboss.logging.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.forms.login.MessageType;
 import org.keycloak.models.UserModel;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import org.slf4j.event.KeyValuePair;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MandatoryAttributeAction implements RequiredActionProvider {
 
     private static final Logger logger = Logger.getLogger(MandatoryAttributeAction.class);
 
     HashMap<String, MandatoryAttributeSettings> settings = new HashMap<>();
+    HashMap<String,String> jsvarsheader = new HashMap<>();
 
     @Override
     public void evaluateTriggers(RequiredActionContext requiredActionContext) {
@@ -53,10 +60,31 @@ public class MandatoryAttributeAction implements RequiredActionProvider {
             return;
         }
 
+        StringBuilder jsCode = getJsCode(requiredActionContext);
         LoginFormsProvider loginFormsProvider = requiredActionContext.form();
+        if (jsCode.length() > 0) {
+            jsCode = new StringBuilder("<script>\n" + jsCode + "</script>\n");
+            loginFormsProvider.setAttribute("jsvarsheader", jsCode.toString());
+        }
+
         Response challenge = loginFormsProvider.createForm(askAbout.formName);
         requiredActionContext.challenge(challenge);
     }
+
+    private @NotNull StringBuilder getJsCode(RequiredActionContext requiredActionContext) {
+        MultivaluedMap<String, String> headers = requiredActionContext.getHttpRequest().getHttpHeaders().getRequestHeaders();
+        StringBuilder jsCode = new StringBuilder();
+        for (Map.Entry<String, String> pair : this.jsvarsheader.entrySet()) {
+            String val = headers.getFirst(pair.getValue());
+            if (val == null) {
+                val = "";
+            }
+            String varLine = String.format("var %s = \"%s\"; \n", pair.getKey(), val);
+            jsCode.append(varLine);
+        }
+        return jsCode;
+    }
+
 
     @Override
     public void processAction(RequiredActionContext requiredActionContext) {

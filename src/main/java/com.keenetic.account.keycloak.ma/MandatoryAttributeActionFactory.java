@@ -51,6 +51,20 @@ public class MandatoryAttributeActionFactory implements RequiredActionFactory  {
         }
         SINGLETON.settings = settings;
 
+        // jsvarsheader must contains string like "var1:value1,var2=value2", converting to map {"var1": "value1", ... }
+        String jsvarsheaderConfig = scope.get("jsvarsheader");
+        if (!jsvarsheaderConfig.isEmpty()) {
+            String[] heads = jsvarsheaderConfig.split(",");
+            HashMap<String, String> jsvarsheader = new HashMap<>();
+            for (String h : heads) {
+                String[] pair = h.split(":");
+                if (pair.length == 2) {
+                    jsvarsheader.put(pair[0], pair[1]);
+                }
+            }
+            SINGLETON.jsvarsheader = jsvarsheader;
+        }
+
         if (settings.keySet().isEmpty()) {
             System.out.println("Mandatory Attribute: no attributes are configured");
         } else {

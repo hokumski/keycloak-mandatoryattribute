@@ -15,8 +15,6 @@ In case of error during form validation, module will set error with name *"yourA
 
 Later we can implement other comparison functions for attributes.
 
-
-
 ### Sample configuration
 add the block to **keycloak.conf**
 
@@ -24,6 +22,16 @@ add the block to **keycloak.conf**
 spi-required-action-mandatory_attribute-attr=phone
 spi-required-action-mandatory_attribute-comparison=not_empty
 spi-required-action-mandatory_attribute-form=ma-form.tpl
+spi-required-action-mandatory_attribute-jsvarsheader:country:x-country-iso-code,another:x-missing-header
+```
+
+Module use attribute *jsvarsheader* to generate the javascript variable from the header value. 
+The example above will generate code, with adding **<#if jsvarheader??>${jsvarheader?no_esc}</#if>** to your template:
+```html
+<script>
+    var country = "DE";
+    var another = "";
+</script>
 ```
 
 If you need to set up many mandatory attributes with different forms, add number from 1 to 9, 

@@ -53,7 +53,7 @@ public class MandatoryAttributeActionFactory implements RequiredActionFactory  {
 
         // jsvarsheader must contains string like "var1:value1,var2=value2", converting to map {"var1": "value1", ... }
         String jsvarsheaderConfig = scope.get("jsvarsheader");
-        if (!jsvarsheaderConfig.isEmpty()) {
+        if (jsvarsheaderConfig != null && !jsvarsheaderConfig.isEmpty()) {
             String[] heads = jsvarsheaderConfig.split(",");
             HashMap<String, String> jsvarsheader = new HashMap<>();
             for (String h : heads) {
